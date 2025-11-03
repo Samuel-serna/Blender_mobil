@@ -1,0 +1,47 @@
+name: Build Blender 3.6 for Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git cmake ninja-build pkg-config \
+            libxi-dev libxxf86vm-dev libxfixes-dev libxrender-dev \
+            libxrandr-dev libxinerama-dev libxcursor-dev libegl1-mesa-dev \
+            libwayland-dev wayland-protocols libxkbcommon-dev \
+            libdbus-1-dev libpulse-dev libasound2-dev libvulkan-dev \
+            python3-dev python3-numpy
+
+      - name: Clone Blender 3.6
+        run: |
+          git clone https://github.com/blender/blender.git --branch blender-v3.6-release --depth 1
+          cd blender
+          make update
+
+      - name: Build Blender
+        run: |
+          cd blender
+          make -j$(nproc)
+
+      - name: Package APK
+        run: |
+          cd blender
+          mkdir -p output
+          zip -r ../Blender-3.6-Android.zip ./build
+          cd ..
+          mv Blender-3.6-Android.zip ${{ github.workspace }}/Blender-3.6-Android.zip
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Blender-3.6-Android
+          path: Blender-3.6-Android.zip
