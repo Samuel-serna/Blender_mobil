@@ -41,7 +41,7 @@ jobs:
           mv Blender-3.6-Android.zip ${{ github.workspace }}/Blender-3.6-Android.zip
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Blender-3.6-Android
           path: Blender-3.6-Android.zip
